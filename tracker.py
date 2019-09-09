@@ -49,7 +49,7 @@ try:
     mariadb_connection = mariadb.connect(**dbconfig)
     if verbose:
         print("Database connected")
-except mariadb.connector.Error as err:
+except mysql.connector.Error as err:
     if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
         print("Something is wrong with your user name or password")
     elif err.errno == errorcode.ER_BAD_DB_ERROR:
@@ -126,7 +126,7 @@ if __name__ == '__main__':
         # store measurement in database
         try:
             cursor.execute('INSERT INTO meting (waarde, sensor_id) VALUES (%s, %s);', (lengtegraad, sensor_id[0]))
-        except mariadb.connector.Error as err:
+        except mysql.connector.Error as err:
             print("Error: {}".format(err))
         else:
             # commit measurements
@@ -139,7 +139,7 @@ if __name__ == '__main__':
         #######################################
         try:
             cursor.execute("SELECT id FROM sensor WHERE naam=%s", [sensor_name1])
-        except mariadb.Error as err:
+        except mysql.Error as err:
             print("Error: {}".format(err))
             sys.exit(2)
         sensor_id = cursor.fetchone()
@@ -152,7 +152,7 @@ if __name__ == '__main__':
         # store measurement in database
         try:
             cursor.execute('INSERT INTO meting (waarde, sensor_id) VALUES (%s, %s);', (breedtegraad, sensor_id[0]))
-        except mariadb.connector.Error as err:
+        except mysql.connector.Error as err:
             print("Error: {}".format(err))
         else:
             # commit measurements
@@ -178,7 +178,7 @@ if __name__ == '__main__':
         # store measurement in database
         try:
             cursor.execute('INSERT INTO meting (waarde, sensor_id) VALUES (%s, %s);', (hoogte, sensor_id[0]))
-        except mariadb.connector.Error as err:
+        except mysql.connector.Error as err:
             print("Error: {}".format(err))
         else:
             # commit measurements
@@ -204,7 +204,7 @@ if __name__ == '__main__':
         # store measurement in database
         try:
             cursor.execute('INSERT INTO meting (waarde, sensor_id) VALUES (%s, %s);', (snelheid, sensor_id[0]))
-        except mariadb.connector.Error as err:
+        except mysql.connector.Error as err:
             print("Error: {}".format(err))
         else:
             # commit measurements
@@ -217,7 +217,7 @@ if __name__ == '__main__':
         ####################################
         try:
             cursor.execute("SELECT id FROM sensor WHERE naam=%s", [sensor_name4])
-        except mariadb.Error as err:
+        except mysql.Error as err:
             print("Error: {}".format(err))
             sys.exit(2)
         sensor_id = cursor.fetchone()
@@ -230,7 +230,7 @@ if __name__ == '__main__':
         # store measurement in database
         try:
             cursor.execute('INSERT INTO meting (waarde, sensor_id) VALUES (%s, %s);', (klim, sensor_id[0]))
-        except mariadb.connector.Error as err:
+        except mysql.connector.Error as err:
             print("Error: {}".format(err))
         else:
             # commit measurements

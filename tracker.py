@@ -9,13 +9,15 @@ import mysql.connector as mariadb
 from mysql.connector import errorcode
 import mysql.connector
 
-sensor_name = 'Lengtegraad';
-sensor_name1 = 'Breedtegraad';
-sensor_name2 = 'Hoogte';
-sensor_name3 = 'Snelheid';
-sensor_name4 = 'Klim';
-
 gpsd = None #seting the global variable
+
+sensor1 = 0
+sensor2 = 0
+sensor3 = 0
+sensor4 = 0
+
+sensorname = ['Lengtegraad', 'Breedtegraad', 'Hoogte', 'Klim']
+sensor= [sensor1, sensor2, sensor3, sensor4]
 
 os.system('clear') #clear the terminal (optional)
 
@@ -86,160 +88,57 @@ if __name__ == '__main__':
         #######################
         # Getting GPS readings#
         #######################
+        sensor1 = gpsd.fix.latitude
+        sensor2 = gpsd.fix.longitude
+        sensor3 = gpsd.fix.altitude
+        sensor4 = gpsd.fix.climb
 
         os.system('clear')
-
-        breedtegraad = gpsd.fix.latitude
-        lengtegraad = gpsd.fix.longitude
-        hoogte = gpsd.fix.altitude
-        snelheid = gpsd.fix.speed
-        klim = gpsd.fix.climb
 
         print ()
         print (' GPS reading')
         print ('----------------------------------------')
-        print ('latitude    ' , breedtegraad)
-        print ('longitude   ' , lengtegraad)
-        print ('time utc    ' , gpsd.utc,' + ', gpsd.fix.time)
-        print ('altitude (m)' , hoogte)
-        print ('speed (m/s) ' , snelheid)
-        print ('climb       ' , klim)
-        print ('track       ' , gpsd.fix.track)
+        print ('latitude    ' , sensor1)
+        print ('longitude   ' , sensor2)
+        print ('altitude (m)' , sensor3)
+        print ('climb       ' , sensor4)
         print ('mode        ' , gpsd.fix.mode)
         print ()
 
-        ########################################
-        # Determine the sensor_id for Longitude#
-        ########################################
-        try:
-            cursor.execute("SELECT id FROM sensor WHERE naam=%s", [sensor_name])
-        except mariadb.Error as err:
-            print("Error: {}".format(err))
-            sys.exit(2)
-        sensor_id = cursor.fetchone()
-        if sensor_id == None:
-            print("Error: no sensor found with naam = %s" % sensor_name)
-            sys.exit(2)
-        if verbose:
-            print("Reading data from sensor %s with id %s" % (sensor_name, sensor_id[0]))
+        x = 0
+        
+        while (x <= 3):
+            ############################
+            # Determine the sensor_id's#
+            ############################
 
-        # store measurement in database
-        try:
-            cursor.execute('INSERT INTO meting (waarde, sensor_id) VALUES (%s, %s);', (lengtegraad, sensor_id[0]))
-        except mysql.connector.Error as err:
-            print("Error: {}".format(err))
-        else:
-            # commit measurements
-            mariadb_connection.commit();
-        if verbose:
-            print("Longitude committed");
+            sensor_name = sensorname[x]
+            
+            try:
+                cursor.execute("SELECT id FROM sensor WHERE naam=%s", [sensor_name])
+            except mariadb.Error as err:
+                print("Error: {}".format(err))
+                sys.exit(2)
+            sensor_id = cursor.fetchone()
+            if sensor_id == None:
+                print("Error: no sensor found with naam = %s" % sensor_name)
+                sys.exit(2)
+            if verbose:
+                print("Reading data from sensor %s with id %s" % (sensor_name, sensor_id[0]))
 
-        #######################################
-        # Determine the sensor_id for Latitude#
-        #######################################
-        try:
-            cursor.execute("SELECT id FROM sensor WHERE naam=%s", [sensor_name1])
-        except mysql.Error as err:
-            print("Error: {}".format(err))
-            sys.exit(2)
-        sensor_id = cursor.fetchone()
-        if sensor_id == None:
-            print("Error: no sensor found with naam = %s" % sensor_name1)
-            sys.exit(2)
-        if verbose:
-            print("Reading data from sensor %s with id %s" % (sensor_name1, sensor_id[0]))
+            # store measurement in database
+            try:
+                cursor.execute('INSERT INTO meting (waarde, sensor_id) VALUES (%s, %s);', (sensor[x], sensor_id[0]))
+            except mysql.connector.Error as err:
+                print("Error: {}".format(err))
+            else:
+                # commit measurements
+                mariadb_connection.commit();
+            if verbose:
+                print(str(sensor_name) + " committed");
+                x += 1
 
-        # store measurement in database
-        try:
-            cursor.execute('INSERT INTO meting (waarde, sensor_id) VALUES (%s, %s);', (breedtegraad, sensor_id[0]))
-        except mysql.connector.Error as err:
-            print("Error: {}".format(err))
-        else:
-            # commit measurements
-            mariadb_connection.commit();
-        if verbose:
-            print("Latitude committed");
-
-        #####################################
-        # Determine the sensor_id for Height#
-        #####################################
-        try:
-            cursor.execute("SELECT id FROM sensor WHERE naam=%s", [sensor_name2])
-        except mariadb.Error as err:
-            print("Error: {}".format(err))
-            sys.exit(2)
-        sensor_id = cursor.fetchone()
-        if sensor_id == None:
-            print("Error: no sensor found with naam = %s" % sensor_name2)
-            sys.exit(2)
-        if verbose:
-            print("Reading data from sensor %s with id %s" % (sensor_name2, sensor_id[0]))
-
-        # store measurement in database
-        try:
-            cursor.execute('INSERT INTO meting (waarde, sensor_id) VALUES (%s, %s);', (hoogte, sensor_id[0]))
-        except mysql.connector.Error as err:
-            print("Error: {}".format(err))
-        else:
-            # commit measurements
-            mariadb_connection.commit();
-        if verbose:
-            print("Height committed");
-
-        #####################################
-        # Determine the sensor_id for Speed#
-        #####################################
-        try:
-            cursor.execute("SELECT id FROM sensor WHERE naam=%s", [sensor_name3])
-        except mariadb.Error as err:
-            print("Error: {}".format(err))
-            sys.exit(2)
-        sensor_id = cursor.fetchone()
-        if sensor_id == None:
-            print("Error: no sensor found with naam = %s" % sensor_name3)
-            sys.exit(2)
-        if verbose:
-            print("Reading data from sensor %s with id %s" % (sensor_name3, sensor_id[0]))
-
-        # store measurement in database
-        try:
-            cursor.execute('INSERT INTO meting (waarde, sensor_id) VALUES (%s, %s);', (snelheid, sensor_id[0]))
-        except mysql.connector.Error as err:
-            print("Error: {}".format(err))
-        else:
-            # commit measurements
-            mariadb_connection.commit();
-        if verbose:
-            print("Speed committed");
-
-        ####################################
-        # Determine the sensor_id for Climb#
-        ####################################
-        try:
-            cursor.execute("SELECT id FROM sensor WHERE naam=%s", [sensor_name4])
-        except mysql.Error as err:
-            print("Error: {}".format(err))
-            sys.exit(2)
-        sensor_id = cursor.fetchone()
-        if sensor_id == None:
-            print("Error: no sensor found with naam = %s" % sensor_name4)
-            sys.exit(2)
-        if verbose:
-            print("Reading data from sensor %s with id %s" % (sensor_name4, sensor_id[0]))
-
-        # store measurement in database
-        try:
-            cursor.execute('INSERT INTO meting (waarde, sensor_id) VALUES (%s, %s);', (klim, sensor_id[0]))
-        except mysql.connector.Error as err:
-            print("Error: {}".format(err))
-        else:
-            # commit measurements
-            mariadb_connection.commit();
-        if verbose:
-            print("Climb committed");
-
-
-        time.sleep(5) #set to whatever
+            time.sleep(5) #set to whatever
 
   except (KeyboardInterrupt, SystemExit): #when you press ctrl+c
     print ("\nKilling Thread...")

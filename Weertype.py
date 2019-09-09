@@ -11,7 +11,7 @@ E = (0, 0, 0) # Empty
 
 sense = SenseHat()
 delay_img = 2
-delay_press = 5
+delay_press = 1
 
 # Demo url to test, so the key doesn't expire
 demo_url = "http://weerlive.nl/api/json-data-10min.php?key=demo&locatie=Amsterdam"
@@ -152,7 +152,7 @@ def press(event):
 
         sleep(delay_img)
         sense.clear()
-        sense.show_message(temp)
+        sense.show_message(temp, text_colour=[255, 0, 0])
         sleep(delay_press)
 
 # If middle button is pressed then it will show weather and tempature

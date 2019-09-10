@@ -52,71 +52,68 @@ cursor = mariadb_connection.cursor()
 # turn on autocommit
 #cursor.autocommit = True
 
-
-# infinite loop
+####################################################################################################################
+# determine the sensor_id for temperature sensor
 try:
-    while True:
-        # determine the sensor_id for temperature sensor
-        try:
-            cursor.execute("SELECT id FROM sensor WHERE naam=%s", [sensor_name])
-        except mariadb.Error as err:
-            print("Error: {}".format(err))
-            sys.exit(2)
-        sensor_id = cursor.fetchone()
-        if sensor_id == None:
-            print("Error: no sensor found with naam = %s" % sensor_name)
-            sys.exit(2)
-        if verbose:
-            print("Reading data from sensor %s with id %s" % (sensor_name, sensor_id[0]))
+    cursor.execute("SELECT id FROM sensor WHERE naam=%s", [sensor_name])
+except mariadb.Error as err:
+    print("Error: {}".format(err))
+    sys.exit(2)
+sensor_id = cursor.fetchone()
+if sensor_id == None:
+    print("Error: no sensor found with naam = %s" % sensor_name)
+    sys.exit(2)
+if verbose:
+    print("Reading data from sensor %s with id %s" % (sensor_name, sensor_id[0]))
         
-        #Temperatuur
-        t = 
+#Temperatuur
+t = 
         
-        # verbose
-        if verbose:
-            print("Temperature: %s C" % t)
-        # store measurement in database
-        try:
-            cursor.execute('INSERT INTO meting (waarde, sensor_id) VALUES (%s, %s);', (t, sensor_id[0]))
-        except mariadb.connector.Error as err:
-            print("Error: {}".format(err))
-        else:
-            # commit measurements
-            mariadb_connection.commit();
-        if verbose:
-            print("Temperature committed");
+# verbose
+if verbose:
+    print("Temperature: %s C" % t)
+    # store measurement in database
+    try:
+        cursor.execute('INSERT INTO meting (waarde, sensor_id) VALUES (%s, %s);', (t, sensor_id[0]))
+    except mariadb.connector.Error as err:
+        print("Error: {}".format(err))
+    else:
+        # commit measurements
+        mariadb_connection.commit();
+if verbose:
+        print("Temperature committed");
             
-        # determine the sensor_id for image
-        try:
-            cursor.execute("SELECT id FROM sensor WHERE naam=%s", [sensor_name1])
-        except mariadb.Error as err:
-            print("Error: {}".format(err))
-            sys.exit(2)
-        sensor_id = cursor.fetchone()
-        if sensor_id == None:
-            print("Error: no sensor found with naam = %s" % sensor_name1)
-            sys.exit(2)
-        if verbose:
-            print("Reading data from sensor %s with id %s" % (sensor_name1, sensor_id[0]))
+# determine the sensor_id for image
+try:
+    cursor.execute("SELECT id FROM sensor WHERE naam=%s", [sensor_name1])
+except mariadb.Error as err:
+    print("Error: {}".format(err))
+    sys.exit(2)
+sensor_id = cursor.fetchone()
+if sensor_id == None:
+    print("Error: no sensor found with naam = %s" % sensor_name1)
+    sys.exit(2)
+if verbose:
+    print("Reading data from sensor %s with id %s" % (sensor_name1, sensor_id[0]))
         
-        #Temperatuur
-        image = 
+#Temperatuur
+image = 
         
-        # verbose
-        if verbose:
-            print("Image: %s C" % image)
-        # store measurement in database
-        try:
-            cursor.execute('INSERT INTO meting (waarde, sensor_id) VALUES (%s, %s);', (image, sensor_id[0]))
-        except mariadb.connector.Error as err:
-            print("Error: {}".format(err))
-        else:
-            # commit measurements
-            mariadb_connection.commit();
-        if verbose:
-            print("Image committed");
+# verbose
+if verbose:
+    print("Image: %s C" % image)
+# store measurement in database
+try:
+    cursor.execute('INSERT INTO meting (waarde, sensor_id) VALUES (%s, %s);', (image, sensor_id[0]))
+except mariadb.connector.Error as err:
+    print("Error: {}".format(err))
+else:
+    # commit measurements
+    mariadb_connection.commit();
+if verbose:
+    print("Image committed");
 
-        time.sleep(interval)
+time.sleep(interval)        
  
 except KeyboardInterrupt:
     pass

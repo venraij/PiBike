@@ -159,7 +159,7 @@ def press(event):
                 E, E, G, G, E, G, E, E,
                 E, G, G, G, G, G, G, E,
                 G, G, Y, G, G, G, Y, G,
-                E, Y, Y, G, G, Y, Y, G,
+                G, Y, Y, G, G, Y, Y, G,
                 E, Y, E, E, E, Y, E, E
             ]
 

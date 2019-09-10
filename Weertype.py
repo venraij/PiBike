@@ -34,7 +34,7 @@ temp = y['temp']
 # A def so you can call it when you press a button
 def press(event):
     if event.action != ACTION_RELEASED:
-        if weertype == "bewolkt" or weertype == "halfbewolkt" or weertype == "zwaarbewolkt" or weertype == "wolkennacht":
+        if weertype == "bewolkt" or weertype == "zwaarbewolkt" or weertype == "wolkennacht":
         # Set up where the image displays
             bewolkt = [
                 G, G, E, E, E, E, E, G,
@@ -49,6 +49,22 @@ def press(event):
 
         # Display these colours on the LED matrix
             sense.set_pixels(bewolkt)
+            
+        elif weertype == "halfbewolkt":
+        # Set up where the image displays
+            halfbewolkt = [
+                G, G, E, E, E, E, E, G,
+                G, G, G, E, E, E, G, G,
+                E, E, E, E, E, E, E, E,
+                E, E, G, G, E, Y, E, Y,
+                E, G, G, G, G, G, G, E,
+                G, G, G, G, Y, G, Y, Y,
+                G, G, G, G, G, G, Y, Y,
+                E, E, E, E, Y, E, Y, Y
+            ]
+
+        # Display these colours on the LED matrix
+            sense.set_pixels(halfbewolkt)
 
         elif weertype == "zonnig":
         # Set up where the image displays

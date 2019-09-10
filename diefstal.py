@@ -35,6 +35,7 @@ def Yes():
 
     while True:
         # Code diefstalpreventie
+        break
 
 def No():
     sense.clear()

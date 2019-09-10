@@ -15,6 +15,7 @@ CREATE TABLE meting (
   sensor_id INT(11) NOT NULL,
   tijd TIMESTAMP,
   waarde FLOAT DEFAULT NULL,
+  weertype VARCHAR(45),
   PRIMARY KEY (id),
   KEY fk_meting_sensor (sensor_id),
   CONSTRAINT fk_meting_sensor FOREIGN KEY (sensor_id) REFERENCES sensor (id)

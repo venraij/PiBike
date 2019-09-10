@@ -28,5 +28,5 @@ GRANT SELECT ON pibike.* TO 'senser'@'localhost';
 INSERT INTO sensor (naam, eenheid) VALUES ('Lengtegraad', 'DD');
 INSERT INTO sensor (naam, eenheid) VALUES ('Breedtegraad', 'DD');
 INSERT INTO sensor (naam, eenheid) VALUES ('Temperatuur', 'C');
-INSERT INTO sensor (naam, eenheid) VALUES ('Image', 'String');
+INSERT INTO sensor (naam, eenheid) VALUES ('Image', 'Str');
 

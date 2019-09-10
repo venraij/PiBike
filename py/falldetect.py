@@ -22,19 +22,18 @@ sense.set_imu_config(True, True, True)
 def orientation_watchdog():
     
     # Returns Orientation - pitch , roll , yaw.
-    # Only roll being relevant
-    # type float
     sense_orientation = sense.get_orientation()
-
-    # Returns accel values depending on severity of the force in x,y,z
-    # Only z being relevant
-    # range 1+
-    # type float
+ 
+    # Returns Accelleration - x, y, z
     sense_accelleration = sense.get_accelerometer_raw()
 
-
     # First, fetch me the specific sensor values I need
+
+    # Type Float 
     roll = sense_orientation["roll"]
+
+    # range 1+ -0
+    # type float
     z_accel = sense_accelleration["z"]
 
     # Variables defined up top for easy reference
@@ -42,8 +41,9 @@ def orientation_watchdog():
     global orient_minus
     global fallen
 
-        # Calculate whether roll between 90 - 270
+
     # Calculate whether force in Z axis sufficient enough to constitute a fall
+    # Ranges defined up top
     # and (z_accel > 1 or z_accel < 0) 
     if roll > orient_min and roll < orient_max:
         fallen = True
@@ -56,11 +56,10 @@ def orientation_watchdog():
         print("begin meetsessie")
         debug = True
 
-    #debug - print sensor values
-        
+    #debug - print sensor values       
     #orientation 
     #print("p: {pitch}, r: {roll}, y: {yaw}".format(**sense_orientation))
-    #print(roll)
+    #print(str(roll) + " vallen staat op " + str(fallen))
     #accelerometer
     print(str(z_accel) + " vallen staat op " + str(fallen))
     #print("x: {x}, y: {y}, z: {z}".format(**sense_accelleration))

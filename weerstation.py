@@ -52,6 +52,7 @@ cursor = mariadb_connection.cursor()
 # turn on autocommit
 #cursor.autocommit = True
 
+####################################################################################################################
 # determine the sensor_id for temperature sensor
 try:
     cursor.execute("SELECT id FROM sensor WHERE naam=%s", [sensor_name])

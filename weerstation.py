@@ -1,20 +1,15 @@
 import sys, getopt
 import argparse
-import sense_hat
 import time
 import mysql.connector as mariadb
 from mysql.connector import errorcode
-
-sensor_name = 'Temperatuur';
-sensor_name1 = 'Luchtvochtigheid';
-sensor_name2 = 'Luchtdruk';
 
 # database connection configuration
 dbconfig = {
     'user': 'sensem',
     'password': 'h@',
     'host': 'localhost',
-    'database': 'weerstation',
+    'database': 'pibike',
     'raise_on_warnings': True,
 }
 
@@ -34,10 +29,6 @@ for opt, arg in opts:
         verbose = True
     elif opt == '-t':
         interval = int(arg)
-
-# instantiate a sense-hat object
-sh = sense_hat.SenseHat()
-
 try:
     mariadb_connection = mariadb.connect(**dbconfig)
     if verbose:
@@ -90,71 +81,6 @@ try:
             mariadb_connection.commit();
         if verbose:
             print("Temperature committed");
-
-        #################################################################################################################
-        # determine the sensor_id for humidity sensor
-        try:
-            cursor.execute("SELECT id FROM sensor WHERE naam=%s", [sensor_name1])
-        except mariadb.Error as err:
-            print("Error: {}".format(err))
-            sys.exit(2)
-        sensor_id = cursor.fetchone()
-        if sensor_id == None:
-            print("Error: no sensor found with naam = %s" % sensor_name1)
-            sys.exit(2)
-        if verbose:
-            print("Reading data from sensor %s with id %s" % (sensor_name1, sensor_id[0]))
-
-        #measure humidity
-        h = round(sh.get_humidity(), 1)
-
-        #verbose
-        if verbose:
-            print("Humidity %s" % h)
-
-        # store measurement in database
-        try:
-            cursor.execute('INSERT INTO meting (waarde, sensor_id) VALUES (%s, %s);', (h, sensor_id[0]))
-        except mariadb.connector.Error as err:
-            print("Error: {}".format(err))
-        else:
-            # commit measurements
-            mariadb_connection.commit();
-        if verbose:
-            print("Humidity committed");
-
-        #################################################################################################################
-        # determine the sensor_id for pressure sensor
-
-        try:
-            cursor.execute("SELECT id FROM sensor WHERE naam=%s", [sensor_name2])
-        except mariadb.Error as err:
-            print("Error: {}".format(err))
-            sys.exit(2)
-        sensor_id = cursor.fetchone()
-        if sensor_id == None:
-            print("Error: no sensor found with naam = %s" % sensor_name2)
-            sys.exit(2)
-        if verbose:
-            print("Reading data from sensor %s with id %s" % (sensor_name2, sensor_id[0]))
-
-        #measure pressure
-        p = round(sh.get_pressure(), 1)
-
-        #verbose
-        if verbose:
-            print("Pressure %s hPa" % p)
-
-        # store measurement in database
-        try:
-            cursor.execute('INSERT INTO meting (waarde, sensor_id) VALUES (%s, %s);', (p, sensor_id[0]))
-        except mariadb.connector.Error as err:
-            print("Error: {}".format(err))
-        else:
-            # commit measurements
-            mariadb_connection.commit();
-        if verbose:
-            print("Pressure committed");
 
         time.sleep(interval)
  

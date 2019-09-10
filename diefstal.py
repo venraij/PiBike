@@ -32,6 +32,10 @@ def Yes():
     time.sleep(5)
 
     sense.clear()
+
+    while True:
+        # Code diefstalpreventie
+
 def No():
     sense.clear()
     kruis = [

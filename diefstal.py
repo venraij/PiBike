@@ -3,6 +3,7 @@ from time import sleep
 import getpass
 import time
 
+#De kleuren van de LEDs
 O = (0, 0, 0)
 W = (255, 255, 255)
 G = (0, 255, 0)
@@ -70,8 +71,7 @@ def parkeren():
     print('Parkeren?')
     sense.set_pixels(park)
         
-        
-              
+                      
 for i in range(1, 4):
     x = 3 - i
     p = getpass.getpass()

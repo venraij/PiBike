@@ -15,15 +15,15 @@ delay_press = 1
 
 # Demo url to test, so the key doesn't expire
 demo_url = "http://weerlive.nl/api/json-data-10min.php?key=demo&locatie=Amsterdam"
-basis_url = "http://weerlive.nl/api/json-data-10min.php?"
+basis_url = "http://weerlive.nl/api/json-data-10min.php?key="
 # Key invullen
-key = "key=27a31f3737"
+key = "27a31f3737"
 rest_url = "&locatie="
-# Stad variabele
-stad = "Zwolle"
+lat = 52
+long = 5
 
-# Change (demo_url) to (basis url + key + rest_url + stad) for normal code
-response = urllib.request.urlopen(demo_url)
+# Change (demo_url) to (basis_url + key + rest_url + str(lat) + "," + str(long)) for normal code
+response = urllib.request.urlopen(basis_url + key + rest_url + str(lat) + "," + str(long))
 data = json.loads(response.read().decode("utf-8"))
 x = data['liveweer']
 y = x[0]
@@ -152,7 +152,7 @@ def press(event):
 
         sleep(delay_img)
         sense.clear()
-        sense.show_message(temp, text_colour=[255, 0, 0])
+        sense.show_message(temp + "C", text_colour=[255, 255, 0])
         sleep(delay_press)
 
 # If middle button is pressed then it will show weather and tempature

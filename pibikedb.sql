@@ -14,7 +14,7 @@ CREATE TABLE meting (
   id INT(11) NOT NULL AUTO_INCREMENT,
   sensor_id INT(11) NOT NULL,
   tijd TIMESTAMP,
-  waarde FLOAT DEFAULT NULL,
+  waarde  FLOAT DEFAULT NULL,
   weertype VARCHAR(45),
   PRIMARY KEY (id),
   KEY fk_meting_sensor (sensor_id),

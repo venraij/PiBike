@@ -1,26 +1,31 @@
 # Auteur - Robin Kleinhoven ICTM1d4
-# Versie 0.5
+# Versie 1.0
+# TODO - Implement yaw / roll / pitch choice - Mount is now static!
+# Mount with either the USB or the SD side toword the front of the bike
+
 # Imports
 from sense_hat import SenseHat
 import time
 
 # Variables
-wait_interval = 1
+measurement_interval = 1
 sense = SenseHat()
-fallen = False
-debug = False
 # define ranges for orientation sensor that equals fall
-orient_min = 85
-orient_max = 285
+# 60 degree offset both clockwise and counter-clockwise 360 - 60 AND 0 + 60
+range_cw = 60
+range_ccw = 300
+debug = False
 
-# Booleans IMU - Compass / Gyro / Accel. More sensors = more accurate
+# Booleans IMU - Compass / Gyro / Accel. Enable more sensors = more accurate
 sense.set_imu_config(True, True, True)
 
 
 # Function Declerations
-# lees de accel data om de zoveel seconden uit - handle val
+
+# Check's whether the bike is at a fallen angle
+# Returns Bool
 def orientation_watchdog():
-    
+
     # Returns Orientation - pitch , roll , yaw.
     sense_orientation = sense.get_orientation()
  
@@ -32,24 +37,29 @@ def orientation_watchdog():
     # Type Float 
     roll = sense_orientation["roll"]
 
+    # Type Float - Implement this at some point
+    yaw = sense_orientation["yaw"]
+
     # range 1+ -0
-    # type float
+    # Type float
     z_accel = sense_accelleration["z"]
 
-    # Variables defined up top for easy reference
-    global orient_plus
-    global orient_minus
-    global fallen
 
+
+    # Variables defined up top for easy reference
+    global range_cw
+    global range_ccw
 
     # Calculate whether force in Z axis sufficient enough to constitute a fall
     # Ranges defined up top
-    # and (z_accel > 1 or z_accel < 0) 
-    if roll > orient_min and roll < orient_max:
-        fallen = True
+    # and (z_accel > 1 or z_accel < 0) - logic not sound
+    if roll > range_cw and roll < range_ccw:
+       return True
     else:
-        fallen = False
+        return False
 
+# Check orientation_watchdog()'s bool for fall.
+def fallen_watchdog():
     # Debug loop to help me log measurement blocks
     global debug
     if debug == False:
@@ -60,20 +70,37 @@ def orientation_watchdog():
     #orientation 
     #print("p: {pitch}, r: {roll}, y: {yaw}".format(**sense_orientation))
     #print(str(roll) + " vallen staat op " + str(fallen))
+    #print(str(roll))
     #accelerometer
-    print(str(z_accel) + " vallen staat op " + str(fallen))
+    #print(str(z_accel) + " vallen staat op " + str(fallen))
     #print("x: {x}, y: {y}, z: {z}".format(**sense_accelleration))
- 
+        
+    # Grab return bool
+    fallen = orientation_watchdog()
+
+    # Check return bool
+    if fallen == True:
+        print(str(fallen))
+        sense.show_message("VAL")
+    else:
+        print(str(fallen))
+        sense.clear()
+        
+
 
 # Main Loop
 try:
     while True:
         orientation_watchdog()
-        time.sleep(wait_interval)
+        fallen_watchdog()
+        time.sleep(measurement_interval)
 except KeyboardInterrupt:
     #Debug - measurement cutoff
     print("eind meetsessie")
     pass
 
+ 
 
-    
+
+
+

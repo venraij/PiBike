@@ -1,4 +1,5 @@
 from sense_hat import SenseHat, ACTION_RELEASED, ACTION_HELD, ACTION_PRESSED
+import pygame
 from time import sleep
 import getpass
 import time
@@ -103,6 +104,15 @@ while True:
             
             if x > 1.5 or y > 1.5 or z > 1.5:
                 sense.show_letter("!", red)
+                pygame.mixer.init()
+                pygame.mixer.music.load("geluid.mp3")
+                pygame.mixer.music.play()
             else:
                 sense.clear()
+
+
+
+
+
+
                 

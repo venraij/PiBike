@@ -1,0 +1,488 @@
+import urllib.request, json
+from sense_hat import SenseHat, ACTION_PRESSED, ACTION_HELD, ACTION_RELEASED
+from time import sleep
+import sys, getopt
+import argparse
+import time
+import mysql.connector as mariadb
+from mysql.connector import errorcode
+import getpass
+import time
+import pygame
+
+#############################################################################
+
+# Define some colours
+Y = (255, 247, 0) # Yellow
+B = (0, 0, 255) # Blue
+G = (105, 105, 105) # Grey
+W = (255, 255, 255) # White
+E = (0, 0, 0) # Empty
+O = (0, 0, 0) # Empty
+Gr = (0, 255, 0) # Grey
+R = (255, 0, 0) # Red
+
+sense = SenseHat()
+delay = 0.1
+delay_img = 2
+delay_press = 1
+Parked = None
+sensor_name = "Temperatuur"
+sensor_name1 = "Image"
+
+# Demo url to test, so the key doesn't expire
+demo_url = "http://weerlive.nl/api/json-data-10min.php?key=demo&locatie=Amsterdam"
+basis_url = "http://weerlive.nl/api/json-data-10min.php?key="
+# Key invullen
+key = "27a31f3737"
+rest_url = "&locatie="
+    
+sense.clear()
+
+#############################################################################
+
+#De functies
+def Yes():
+    sense.clear()
+    global Parked
+    vink = [
+        O,O,O,O,O,O,O,O,
+        O,O,O,O,O,O,O,O,
+        O,O,O,O,O,O,O,Gr,
+        O,O,O,O,O,O,Gr,Gr,
+        Gr,O,O,O,O,Gr,Gr,O, 
+        Gr,Gr,O,O,Gr,Gr,O,O,
+        O,Gr,Gr,Gr,Gr,O,O,O,
+        O,O,Gr,Gr,O,O,O,O
+    ]
+
+                  
+    sense.set_pixels(vink)
+    Parked = True
+    if Parked is True:
+        print('Je fiets is geparkeerd')
+    time.sleep(1)
+    sense.clear()
+    
+def No():
+    sense.clear()
+    kruis = [
+        R,O,O,O,O,O,O,R,
+        O,R,O,O,O,O,R,O,
+        O,O,R,O,O,R,O,O,
+        O,O,O,R,R,O,O,O,
+        O,O,O,R,R,O,O,O,
+        O,O,R,O,O,R,O,O,
+        O,R,O,O,O,O,R,O,
+        R,O,O,O,O,O,O,R
+    ]
+
+                    
+    sense.set_pixels(kruis)
+    time.sleep(1)
+    Parked = False
+                   
+    sense.clear()            
+
+def parkeren():
+    park = [
+        O,O,O,O,O,Gr,O,Gr,
+        W,W,W,O,O,Gr,Gr,Gr,
+        W,O,O,W,O,O,Gr,O,
+        W,O,O,W,O,Gr,O,O,
+        W,W,W,O,O,O,O,O,
+        W,O,O,O,O,R,R,R,
+        W,O,O,O,O,R,O,R,
+        W,O,O,O,O,R,O,R
+    ]
+    print('Parkeren?')
+    sense.set_pixels(park)
+
+def stolen():
+    alarm = [
+        R, R, R, R, R, R, R, R,
+        R, R, R, R, R, R, R, R,
+        R, R, R, R, R, R, R, R,
+        R, R, R, R, R, R, R, R,
+        R, R, R, R, R, R, R, R,
+        R, R, R, R, R, R, R, R,
+        R, R, R, R, R, R, R, R,
+        R, R, R, R, R, R, R, R
+    ]
+
+    empty = [
+        O, O, O, O, O, O, O, O,
+        O, O, O, O, O, O, O, O,
+        O, O, O, O, O, O, O, O,
+        O, O, O, O, O, O, O, O,
+        O, O, O, O, O, O, O, O,
+        O, O, O, O, O, O, O, O,
+        O, O, O, O, O, O, O, O,
+        O, O, O, O, O, O, O, O
+    ]
+
+    sense.set_pixels(alarm)
+    sleep(delay)
+    sense.set_pixels(empty)
+    sleep(delay)
+
+def geluid():
+    pygame.mixer.init()
+    pygame.mixer.music.load("geluid.mp3")
+    pygame.mixer.music.play()
+
+def wrong():
+    geluid()
+    for q in range(50):
+        stolen()
+    charlie = getpass.getpass(prompt='Password: ')
+    if charlie == 'pi':
+        return
+    else:
+        wrong()
+
+def alarm(event):
+    if event.action != ACTION_RELEASED and event.direction == "down" and event.action != ACTION_HELD:       
+        for i in range(1, 4):
+            x = 3 - i
+            foxtrot = getpass.getpass(prompt= 'Password: ')
+            if foxtrot =='pi':
+                parkeren()
+                vraag = getpass.getpass(prompt='Y/n)')
+                if vraag == 'Y' or vraag == 'y':
+                    Yes()
+                else:
+                    No()
+                break
+            else:
+                print("Wrong, you have " + str(x) + " attempts")
+
+        while Parked is True:
+            codes = sense.get_accelerometer_raw()
+            x = codes['x']
+            y = codes['y']
+            z = codes['z']
+
+            x = abs(x)
+            y = abs(y)
+            z = abs(z)
+
+            for event in sense.stick.get_events():
+                if event.action != ACTION_RELEASED and event.direction == "down" and event.action == ACTION_HELD:
+                    echo = getpass.getpass(prompt='Password: ')
+                    if echo == 'pi':
+                        return
+                    else:
+                        wrong()
+            
+            if x > 1.25 or y > 1.25 or z > 1.25:
+                wrong()
+            else:
+                sense.clear()
+##############################################################################
+
+# A def so you can call it when you press a button
+def press(event):
+    if event.action != ACTION_RELEASED:
+        if bravo[0] == "bewolkt" or bravo[0] == "zwaarbewolkt" or bravo == "wolkennacht":
+        # Set up where the image displays
+            bewolkt = [
+                G, G, E, E, E, E, E, G,
+                G, G, G, E, E, E, G, G,
+                E, E, E, E, E, E, E, E,
+                E, E, G, G, E, G, E, E,
+                E, G, G, G, G, G, G, E,
+                G, G, G, G, G, G, G, G,
+                G, G, G, G, G, G, G, G,
+                E, E, E, E, E, E, E, E
+            ]
+
+        # Display these colours on the LED matrix
+            sense.set_pixels(bewolkt)
+            
+        elif bravo[0] == "halfbewolkt":
+        # Set up where the image displays
+            halfbewolkt = [
+                G, G, E, E, E, E, E, G,
+                G, G, G, E, E, E, G, G,
+                E, E, E, E, E, E, E, E,
+                E, E, G, G, E, Y, E, Y,
+                E, G, G, G, G, G, G, E,
+                G, G, G, G, Y, G, Y, Y,
+                G, G, G, G, G, G, Y, Y,
+                E, E, E, E, Y, E, Y, Y
+            ]
+
+        # Display these colours on the LED matrix
+            sense.set_pixels(halfbewolkt)
+
+        elif bravo[0] == "zonnig":
+        # Set up where the image displays
+            zonnig = [
+                Y, E, Y, E, Y, E, Y, E,
+                E, E, E, E, E, E, E, Y,
+                Y, E, E, Y, Y, E, E, E,
+                E, E, Y, Y, Y, Y, E, Y,
+                Y, E, Y, Y, Y, Y, E, E,
+                E, E, E, Y, Y, E, E, Y,
+                Y, E, E, E, E, E, E, E,
+                E, Y, E, Y, E, Y, E, Y
+            ]
+
+        # Display these colours on the LED matrix
+            sense.set_pixels(zonnig)
+
+        elif bravo[0] == "bliksem":
+        # Set up where the image displays
+            bliksem = [
+                G, G, E, E, E, E, E, G,
+                B, G, G, E, E, E, G, B,
+                B, E, E, E, E, E, E, B,
+                E, E, G, G, E, G, E, E,
+                E, G, G, G, G, G, G, E,
+                G, G, Y, G, G, G, Y, G,
+                G, Y, Y, G, G, Y, Y, G,
+                E, Y, E, E, E, Y, E, E
+            ]
+
+        # Display these colours on the LED matrix
+            sense.set_pixels(bliksem)
+
+        elif bravo[0] == "regen" or bravo[0] == "buien":
+        # Set up where the image displays
+            regen = [
+                G, G, E, E, E, E, E, G,
+                B, G, G, E, E, E, G, B,
+                B, E, E, E, E, E, E, B,
+                E, E, G, G, E, G, E, E,
+                E, G, G, G, G, G, G, E,
+                G, G, G, G, G, G, G, G,
+                B, G, B, G, B, G, B, G,
+                B, E, B, E, B, E, B, E
+            ]
+
+        # Display these colours on the LED matrix
+            sense.set_pixels(regen)
+
+        elif bravo[0] == "hagel" or bravo[0] == "sneeuw":
+        # Set up where the image displays
+            sneeuw = [
+                E, E, G, G, E, G, E, E,
+                E, G, G, G, G, G, G, E,
+                G, G, G, G, G, G, G, G,
+                E, W, E, W, E, W, E, W,
+                W, E, W, E, W, E, W, E,
+                E, W, E, W, E, W, E, W,
+                W, E, W, E, W, E, W, E,
+                E, W, E, W, E, W, E, W
+            ]
+
+        # Display these colours on the LED matrix
+            sense.set_pixels(sneeuw)
+
+        elif bravo[0] == "mist" or bravo[0] == "nachtmist":
+        # Set up where the image displays
+            mist = [
+                E, E, E, E, E, E, E, E,
+                E, E, E, E, E, E, E, E,
+                E, E, E, E, E, E, E, E,
+                E, E, E, E, E, E, E, E,
+                E, E, E, E, E, E, E, E,
+                E, G, G, E, G, G, G, E,
+                G, G, G, G, G, G, G, G,
+                G, G, G, G, G, G, G, G
+            ]
+
+        # Display these colours on the LED matrix
+            sense.set_pixels(mist)
+
+        elif bravo[0] == "helderenacht":
+        # Set up where the image displays
+            nacht = [
+                E, E, E, E, E, E, E, E,
+                E, E, E, G, G, E, E, E,
+                E, E, G, G, G, G, E, E,
+                E, G, G, G, G, G, G, E,
+                E, G, G, G, G, G, G, E,
+                E, E, G, G, G, G, E, E,
+                E, E, E, G, G, E, E, E,
+                E, E, E, E, E, E, E, E,
+            ]
+
+        # Display these colours on the LED matrix
+            sense.set_pixels(nacht)
+
+        else:
+        # Yeah Earth is gone...
+            print("There is no weather, Earth is gone")
+
+        sleep(delay_img)
+        sense.clear()
+        sense.show_message(str(alfa[0]) + "C", text_colour=[255, 255, 0])
+        sleep(delay_press)
+
+#############################################################################
+
+# database connection configuration
+dbconfig = {
+    'user': 'sensem',
+    'password': 'h@',
+    'host': 'localhost',
+    'database': 'pibike',
+    'raise_on_warnings': True,
+}
+
+# parse arguments
+verbose = True
+interval = 10   # second
+try:
+    opts, args = getopt.getopt(sys.argv[1:], "vt:")
+except getopt.GetoptError as err:
+    print(str(err))
+    print('measure.py -v -t <interval>')
+    print('-v: be verbose')
+    print('-t <interval>: measure each <interval> seconds (default: 10s)')
+    sys.exit(2)
+for opt, arg in opts:
+    if opt == '-v':
+        verbose = True
+    elif opt == '-t':
+        interval = int(arg)
+        
+#verbinden met de database        
+try:
+    mariadb_connection = mariadb.connect(**dbconfig)
+    if verbose:
+        print("Database connected")
+except mariadb.connector.Error as err:
+    if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+        print("Something is wrong with your user name or password")
+    elif err.errno == errorcode.ER_BAD_DB_ERROR:
+        print("Database does not exist")
+    else:
+        print("Error: {}".format(err))
+    sys.exit(2)
+    
+# create the database cursor for executing SQL queries
+cursor = mariadb_connection.cursor()
+# turn on autocommit
+#cursor.autocommit = True
+
+# determine the latest lat
+try:
+    cursor.execute('SELECT waarde FROM meting WHERE sensor_id = 1 ORDER BY id DESC LIMIT 1;')
+except mariadb.Error as err:
+    print("Error: {}".format(err))
+    sys.exit(2)
+charlie = cursor.fetchone()
+
+# determine the latest long
+try:
+    cursor.execute('SELECT waarde FROM meting WHERE sensor_id = 2 ORDER BY id DESC LIMIT 1;')
+except mariadb.Error as err:
+    print("Error: {}".format(err))
+    sys.exit(2)
+delta = cursor.fetchone()
+
+##############################################################################
+
+try:
+    # Change (demo_url) to (basis_url + key + rest_url + str(lat) + "," + str(long)) for normal code
+    response = urllib.request.urlopen(basis_url + key + rest_url + str(charlie[0]) + "," + str(delta[0]))
+    data = json.loads(response.read().decode("utf-8"))
+    x = data['liveweer']
+    y = x[0]
+    image = y['image']
+    temp = y['temp']
+    plaats = y['plaats']
+
+    try:
+        cursor.execute("SELECT id FROM sensor WHERE naam=%s", [sensor_name])
+    except mariadb.Error as err:
+        print("Error: {}".format(err))
+        sys.exit(2)
+    sensor_id = cursor.fetchone()
+    if sensor_id == None:
+        print("Error: no sensor found with naam = %s" % sensor_name)
+        sys.exit(2)
+    if verbose:
+        print("Reading data from sensor %s with id %s" % (sensor_name, sensor_id[0]))
+            
+    #Temperatuur
+    t = temp
+            
+    # verbose
+    if verbose:
+        print("Temperature: %s C" % t)
+        # store measurement in database
+        try:
+            cursor.execute('INSERT INTO meting (waarde, sensor_id) VALUES (%s, %s);', (t, sensor_id[0]))
+        except mariadb.connector.Error as err:
+            print("Error: {}".format(err))
+        else:
+            # commit measurements
+            mariadb_connection.commit();
+    if verbose:
+            print("Temperature committed");
+                
+    # determine the sensor_id for image
+    try:
+        cursor.execute("SELECT id FROM sensor WHERE naam=%s", [sensor_name1])
+    except mariadb.Error as err:
+        print("Error: {}".format(err))
+        sys.exit(2)
+    sensor_id = cursor.fetchone()
+    if sensor_id == None:
+        print("Error: no sensor found with naam = %s" % sensor_name1)
+        sys.exit(2)
+    if verbose:
+        print("Reading data from sensor %s with id %s" % (sensor_name1, sensor_id[0]))
+            
+    #weertype
+    weertype = image
+            
+    # verbose
+    if verbose:
+        print("Image: %s" % image)
+        # store measurement in database
+        try:
+            cursor.execute('INSERT INTO meting (weertype, sensor_id) VALUES (%s, %s);', (image, sensor_id[0]))
+        except mariadb.connector.Error as err:
+            print("Error: {}".format(err))
+        else:
+            # commit measurements
+            mariadb_connection.commit();
+    if verbose:
+        print("Image committed");
+except Exception as e:
+    print ("No internet connection")
+    
+# determine the latest temperature
+try:
+    cursor.execute('SELECT waarde FROM meting WHERE sensor_id = 3 ORDER BY id DESC LIMIT 1;')
+except mariadb.Error as err:
+    print("Error: {}".format(err))
+    sys.exit(2)
+alfa = cursor.fetchone()
+print(alfa[0])
+
+# determine the latest weertype
+try:
+    cursor.execute('SELECT weertype FROM meting WHERE sensor_id = 4 ORDER BY id DESC LIMIT 1;')
+except mariadb.Error as err:
+    print("Error: {}".format(err))
+    sys.exit(2)
+bravo = cursor.fetchone()
+print(bravo[0])
+
+# close db connection
+mariadb_connection.close()
+
+################################################################################
+
+# If middle button is pressed then it will show weather and tempature
+sense.stick.direction_middle = press
+# If down button is pressed then it will activate alarm
+## To deactivate alarm hold down
+sense.stick.direction_down = alarm
+

@@ -1,8 +1,10 @@
 from sense_hat import SenseHat, ACTION_RELEASED, ACTION_HELD, ACTION_PRESSED
-import pygame
 from time import sleep
 import getpass
 import time
+import pygame
+import sys
+import os
 
 O = (0, 0, 0)
 W = (255, 255, 255)
@@ -11,7 +13,7 @@ R = (255, 0, 0)
 red = (255, 0, 0)
 
 sense = SenseHat()
-
+delay = 0.1
 Parked = None
     
 sense.clear()
@@ -36,7 +38,7 @@ def Yes():
     Parked = True
     if Parked is True:
         print('Je fiets is geparkeerd')
-    time.sleep(5)
+    time.sleep(1)
     sense.clear()
     
 def No():
@@ -54,7 +56,7 @@ def No():
 
                     
     sense.set_pixels(kruis)
-    time.sleep(5)
+    time.sleep(1)
     Parked = False
                    
     sense.clear()            
@@ -72,12 +74,53 @@ def parkeren():
     ]
     print('Parkeren?')
     sense.set_pixels(park)
-        
-        
-              
+
+def stolen():
+    alarm = [
+        R, R, R, R, R, R, R, R,
+        R, R, R, R, R, R, R, R,
+        R, R, R, R, R, R, R, R,
+        R, R, R, R, R, R, R, R,
+        R, R, R, R, R, R, R, R,
+        R, R, R, R, R, R, R, R,
+        R, R, R, R, R, R, R, R,
+        R, R, R, R, R, R, R, R
+    ]
+
+    empty = [
+        O, O, O, O, O, O, O, O,
+        O, O, O, O, O, O, O, O,
+        O, O, O, O, O, O, O, O,
+        O, O, O, O, O, O, O, O,
+        O, O, O, O, O, O, O, O,
+        O, O, O, O, O, O, O, O,
+        O, O, O, O, O, O, O, O,
+        O, O, O, O, O, O, O, O
+    ]
+
+    sense.set_pixels(alarm)
+    sleep(delay)
+    sense.set_pixels(empty)
+    sleep(delay)
+
+def geluid():
+    pygame.mixer.init()
+    pygame.mixer.music.load("geluid.mp3")
+    pygame.mixer.music.play()
+
+def wrong():
+    geluid()
+    for q in range(50):
+        stolen()
+    charlie = getpass.getpass(prompt='Password: ')
+    if charlie == 'pi':
+        sys.exit()
+    else:
+        wrong()
+                
 for i in range(1, 4):
     x = 3 - i
-    p = getpass.getpass()
+    p = getpass.getpass(prompt= 'Password: ')
     if p =='pi':
         parkeren()
         vraag = getpass.getpass(prompt='Y/n)')
@@ -87,32 +130,30 @@ for i in range(1, 4):
             No()
         break
     else:
-        print("wrong, you have " + str(x) + " attempts")
+        print("Wrong, you have " + str(x) + " attempts")
 
-while True:
-        # Code diefstalpreventie
-        if Parked is True:
-            codes = sense.get_accelerometer_raw()
-            
-            x = codes['x']
-            y = codes['y']
-            z = codes['z']
+while Parked is True:
+    codes = sense.get_accelerometer_raw()
+    x = codes['x']
+    y = codes['y']
+    z = codes['z']
 
-            x = abs(x)
-            y = abs(y)
-            z = abs(z)
-            
-            if x > 1.5 or y > 1.5 or z > 1.5:
-                sense.show_letter("!", red)
-                pygame.mixer.init()
-                pygame.mixer.music.load("geluid.mp3")
-                pygame.mixer.music.play()
+    x = abs(x)
+    y = abs(y)
+    z = abs(z)
+
+    for event in sense.stick.get_events():
+        if event.action != ACTION_RELEASED and event.direction == "down" and event.action == ACTION_HELD:
+            delta = getpass.getpass(prompt='Password: ')
+            if delta == 'pi':
+                sys.exit() 
             else:
-                sense.clear()
+                wrong()
+    
+    if x > 1.25 or y > 1.25 or z > 1.25:
+        wrong()
+    else:
+        sense.clear()
 
 
 
-
-
-
-                

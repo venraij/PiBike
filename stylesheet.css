@@ -1,0 +1,52 @@
+body{
+	background-color: #aaa;
+}
+header {
+  background-color: #666;
+  padding: 30px;
+  text-align: center;
+  font-size: 35px;
+  color: white;
+  margin: 0px
+}
+nav {
+  float: left;
+  width: 15%;
+  height: 400px;
+  background: #ccc;
+
+}
+section{
+  content: "";
+  display: table;
+  clear: both;
+  width: 1200px;
+}
+footer {
+  background-color: #777;
+  padding: 10px;
+  text-align: center;
+  color: white;
+}
+@media (max-width: 1200px) {
+  nav, article {
+    width: 85%;
+    height: auto;
+ }	
+}
+
+
+a:link, a:visited {
+  background-color: #000;
+  color: white;
+  padding: 15px 25px;
+  border: 1px solid black;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  width: 65px;
+  height: 45px;
+}
+a:hover, a:active {
+  background-color: #555;
+}

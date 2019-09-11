@@ -24,6 +24,7 @@ CREATE USER 'sensem'@'localhost' IDENTIFIED BY 'h@';
 CREATE USER 'senser'@'localhost' IDENTIFIED BY 'h@';
 GRANT INSERT ON pibike.meting TO 'sensem'@'localhost';
 GRANT SELECT ON pibike.sensor TO 'sensem'@'localhost';
+GRANT SELECT ON pibike.meting TO 'sensem'@'localhost';
 GRANT SELECT ON pibike.* TO 'senser'@'localhost';
 
 INSERT INTO sensor (naam, eenheid) VALUES ('Lengtegraad', 'DD');

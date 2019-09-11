@@ -3,20 +3,22 @@ from time import sleep
 import getpass
 import time
 
-#De kleuren van de LEDs
 O = (0, 0, 0)
 W = (255, 255, 255)
 G = (0, 255, 0)
 R = (255, 0, 0)
+red = (255, 0, 0)
 
 sense = SenseHat()
 
+Parked = None
     
 sense.clear()
 
 #De functies
 def Yes():
     sense.clear()
+    global Parked
     vink = [
         O,O,O,O,O,O,O,O,
         O,O,O,O,O,O,O,O,
@@ -30,14 +32,12 @@ def Yes():
 
                   
     sense.set_pixels(vink)
+    Parked = True
+    if Parked is True:
+        print('Je fiets is geparkeerd')
     time.sleep(5)
-
     sense.clear()
-
-    while True:
-        # Code diefstalpreventie
-        break
-
+    
 def No():
     sense.clear()
     kruis = [
@@ -54,6 +54,7 @@ def No():
                     
     sense.set_pixels(kruis)
     time.sleep(5)
+    Parked = False
                    
     sense.clear()            
 
@@ -71,7 +72,8 @@ def parkeren():
     print('Parkeren?')
     sense.set_pixels(park)
         
-                      
+        
+              
 for i in range(1, 4):
     x = 3 - i
     p = getpass.getpass()
@@ -85,3 +87,22 @@ for i in range(1, 4):
         break
     else:
         print("wrong, you have " + str(x) + " attempts")
+
+while True:
+        # Code diefstalpreventie
+        if Parked is True:
+            codes = sense.get_accelerometer_raw()
+            
+            x = codes['x']
+            y = codes['y']
+            z = codes['z']
+
+            x = abs(x)
+            y = abs(y)
+            z = abs(z)
+            
+            if x > 1.5 or y > 1.5 or z > 1.5:
+                sense.show_letter("!", red)
+            else:
+                sense.clear()
+                

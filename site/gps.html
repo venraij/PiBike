@@ -1,17 +1,33 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
+<title>Pi - Bike</title>
+<link rel="stylesheet" href="stylesheet.css">
+</head>
+<body>
     <style>
        /* Set the size of the div element that contains the map */
       #map {
-        height: 400px;  /* The height is 400 pixels */
-        width: 100%;  /* The width is the width of the web page */
+        height: 300px;  /* The height is 200 pixels */
+        width: 75%;  /* The width is the width of the web page */
        }
     </style>
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-  </head>
-  <body> 
-    <h3>Huidige Fietslocatie</h3>
+<header>
+<p>Fietslocatie</p>
+</header>
+<section>
+<nav>
+<ul style="list-style-type:none;">
+    <li><a href="index.html">Hoofdpagina</a></li>
+    <li><a href="gps.html">Fietslocatie</a></li>
+    <li><a href="valdetectie.html">Val detectie</a></li>
+    <li><a href="diefstal.html">Diefstal alarm</a></li>
+    <li><a href="parkeren.html">Parkeer assistentie</a></li>
+</ul>
+</nav>
+<article>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script> 
+    <center><h3>Huidige Fietslocatie</h3>
     <div class="mypanel"></div>
     <p id="lat"></p>
     <p id="lon"></p>
@@ -46,6 +62,11 @@ function initMap() {
     -->
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBnejzs-LTCWKvYc9YSAB_04UbZx2_imu8&callback=initMap">
-    </script>
-  </body>
+    </script></center>
+</article>
+</section>
+<footer>
+	<p>Copyright © 2019 ICTM1d Groep 4</p>
+</footer>
+</body>
 </html>

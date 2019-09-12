@@ -15,7 +15,7 @@ sense = SenseHat()
 # 60 degree offset both clockwise and counter-clockwise 360 - 60 AND 0 + 60
 range_cw = 60
 range_ccw = 300
-debug = False
+#debug = False
 R = [255, 0, 0]
 W = [0, 0, 0]
 fallen_message = [
@@ -81,7 +81,7 @@ def orientation_watchdog():
 # Check orientation_watchdog()'s bool for fall.
 def fallen_watchdog():
     # Debug loop to help me log measurement blocks
-    global debug
+    #global debug
     global fallen_message
     
     #if debug == False:
@@ -94,10 +94,10 @@ def fallen_watchdog():
     
     # Check return bool
     if fallen == True:
-        print(str(fallen))
+        #print(str(fallen))
         sense.set_pixels(fallen_message)
     else:
-        print(str(fallen))
+        #print(str(fallen))
         sense.clear()
         
 # Main Loop

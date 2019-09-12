@@ -131,16 +131,6 @@ def geluid():
     pygame.mixer.music.load("geluid.mp3")
     pygame.mixer.music.play()
 
-def wrong():
-    geluid()
-    for q in range(50):
-        stolen()
-    charlie = getpass.getpass(prompt='Password: ')
-    if charlie == 'pi':
-        return
-    else:
-        wrong()
-
 def alarm(event):
     if event.action != ACTION_RELEASED and event.direction == "down" and event.action != ACTION_HELD:       
         for i in range(1, 4):
@@ -173,12 +163,15 @@ def alarm(event):
                     if echo == 'pi':
                         return
                     else:
-                        wrong()
+                        geluid()
+                        for q in range(50):
+                            stolen()
+                        break
             
             if x > 1.25 or y > 1.25 or z > 1.25:
-                wrong()
-            else:
-                sense.clear()
+                geluid()
+                for q in range(50):
+                    stolen()
 ##############################################################################
 
 # A def so you can call it when you press a button

@@ -1,6 +1,7 @@
 # Auteur - Robin Kleinhoven ICTM1d4
-# Versie 1.0
+# Versie 1.1
 # TODO - Implement yaw / roll / pitch choice - Mount is now static!
+# TODO - Implement if the value in in the range for at least X seconds. = sensor needs to "acclimate"
 # Mount with either the USB or the SD side toword the front of the bike
 
 # Imports
@@ -15,6 +16,18 @@ sense = SenseHat()
 range_cw = 60
 range_ccw = 300
 debug = False
+R = [255, 0, 0]
+W = [0, 0, 0]
+fallen_message = [
+W, W, W, W, W, W, W, W,
+W, W, W, W, W, W, W, W,
+R, R, R, W, W, W, W, W,
+R, R, R, R, R, W, R, R,
+R, R, R, R, R, W, R, R,
+R, R, R, W, W, W, W, W,
+W, W, W, W, W, W, W, W,
+W, W, W, W, W, W, W, W,
+]
 
 # Booleans IMU - Compass / Gyro / Accel. Enable more sensors = more accurate
 sense.set_imu_config(True, True, True)
@@ -44,7 +57,14 @@ def orientation_watchdog():
     # Type float
     z_accel = sense_accelleration["z"]
 
-
+    #debug - print sensor values       
+    #orientation 
+    #print("p: {pitch}, r: {roll}, y: {yaw}".format(**sense_orientation))
+    print(str(roll))
+    #print(str(roll))
+    #accelerometer
+    #print(str(z_accel) + " vallen staat op " + str(fallen))
+    #print("x: {x}, y: {y}, z: {z}".format(**sense_accelleration))
 
     # Variables defined up top for easy reference
     global range_cw
@@ -62,32 +82,24 @@ def orientation_watchdog():
 def fallen_watchdog():
     # Debug loop to help me log measurement blocks
     global debug
-    if debug == False:
-        print("begin meetsessie")
-        debug = True
+    global fallen_message
+    
+    #if debug == False:
+    #    print("begin meetsessie")
+    #    debug = True
 
-    #debug - print sensor values       
-    #orientation 
-    #print("p: {pitch}, r: {roll}, y: {yaw}".format(**sense_orientation))
-    #print(str(roll) + " vallen staat op " + str(fallen))
-    #print(str(roll))
-    #accelerometer
-    #print(str(z_accel) + " vallen staat op " + str(fallen))
-    #print("x: {x}, y: {y}, z: {z}".format(**sense_accelleration))
-        
+    
     # Grab return bool
     fallen = orientation_watchdog()
-
+    
     # Check return bool
     if fallen == True:
         print(str(fallen))
-        sense.show_message("VAL")
+        sense.set_pixels(fallen_message)
     else:
         print(str(fallen))
         sense.clear()
         
-
-
 # Main Loop
 try:
     while True:
@@ -96,11 +108,5 @@ try:
         time.sleep(measurement_interval)
 except KeyboardInterrupt:
     #Debug - measurement cutoff
-    print("eind meetsessie")
+    #print("eind meetsessie")
     pass
-
- 
-
-
-
-

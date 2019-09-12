@@ -168,10 +168,11 @@ def alarm(event):
                             stolen()
                         break
             
-            if x > 1.25 or y > 1.25 or z > 1.25:
+            if x > 1.1 or y > 1.1 or z > 1.1:
                 geluid()
                 for q in range(50):
                     stolen()
+
 ##############################################################################
 
 # A def so you can call it when you press a button

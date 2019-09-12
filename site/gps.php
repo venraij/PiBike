@@ -19,7 +19,7 @@
 <nav>
 <ul style="list-style-type:none;">
     <li><a href="index.html">Hoofdpagina</a></li>
-    <li><a href="gps.html">Fietslocatie</a></li>
+    <li><a href="gps.php">Fietslocatie</a></li>
     <li><a href="valdetectie.html">Val detectie</a></li>
     <li><a href="diefstal.html">Diefstal alarm</a></li>
     <li><a href="parkeren.html">Parkeer assistentie</a></li>
@@ -29,25 +29,41 @@
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script> 
     <center><h3>Huidige Fietslocatie</h3>
     <div class="mypanel"></div>
-    <p id="lat"></p>
-    <p id="lon"></p>
     <!--The div element for the map -->
     <div id="map"></div>
-    <script>
+	     
+    	?php
+	$servername = "localhost";
+	$username = "nickvraaij_pibike";
+	$password = "pibike";
+	$dbname = "nickvraaij_pibike";
+
+	// Create connection
+	$conn = new mysqli($servername, $username, $password, $dbname);
+	// Check connection
+	if ($conn->connect_error) {
+		die("Connection failed: " . $conn->connect_error);
+	}
+
+        $link = mysqli_connect("localhost", "nickvraaij_pibike", "pibike", "nickvraaij_pibike");
+
+	$lon = mysqli_query($link, "SELECT waarde FROM meting WHERE sensor_id = 2 ORDER BY id DESC LIMIT 1");
 	
-	$.getJSON('/throwdata.py', function(data) {
-    	//data is the JSON string
-		console.log(data)
+	$lat = mysqli_query($link, "SELECT waarde FROM meting WHERE sensor_id = 1 ORDER BY id DESC LIMIT 1");
 
+        $lonresult = mysqli_fetch_assoc($lon);
+        $latresult = mysqli_fetch_assoc($lat);
 
-		document.getElementById("lat").innerHTML =
-		"lat: " + data.waarde;
-	});
+	$conn->close();
+	?>   
+	    
+    <script>
+
 
 // Initialize and add the map
 function initMap() {
   // The location of Uluru
-  var uluru = {lat: -25.344, lng: 131.036};
+  var uluru = {lat: <?php echo ($latresult['waarde']) ?>, lng: <?php echo ($lonresult['waarde']) ?>};
   // The map, centered at Uluru
   var map = new google.maps.Map(
       document.getElementById('map'), {zoom: 4, center: uluru});
